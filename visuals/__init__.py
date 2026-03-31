@@ -1,4 +1,4 @@
-from .animator import animate_droste, animate_droste_steps
+from .animator import animate_droste, animate_droste_steps, c_constant_simulation
 from .simulation import run_simulation
 from .window import run_interactive_viewer
 __all__=[
@@ -6,4 +6,5 @@ __all__=[
     'run_simulation',
     'animate_droste_steps',
     'run_interactive_viewer',
+    'c_constant_simulation',
 ]

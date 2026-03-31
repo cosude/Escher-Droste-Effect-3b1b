@@ -23,12 +23,11 @@ def run_simulation(image_path):
     inner_width = data['inner_w'] 
     zoom_factor = data['S']
 
-    print("Generating Droste map... calculating coordinates.")
-
-    m1, m2, zoom_provider = prepare_droste_data(
-        w, h, cx, cy, inner_width, zoom_factor
+    engine = DrosteEngine(
+        out_width=w, out_height=h, 
+        center_x=cx, center_y=cy, 
+        inner_width=inner_width, 
+        zoom_factor=zoom_factor
     )
-    
-    m3 = zoom_provider(0)
 
-    run_interactive_viewer(original_img, m1, m2, m3, zoom_provider)
+    run_interactive_viewer(original_img, engine)

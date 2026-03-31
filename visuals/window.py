@@ -3,7 +3,7 @@ import numpy as np
 from visuals import *
 from transformer import *
 
-def run_interactive_viewer(img, m1, m2, m3, zoom_provider):
+def run_interactive_viewer(img, engine):
     window_name = "Droste Math Visualizer" 
     cv2.namedWindow(window_name, cv2.WINDOW_AUTOSIZE)
 
@@ -18,11 +18,11 @@ def run_interactive_viewer(img, m1, m2, m3, zoom_provider):
         cv2.putText(menu_frame, "[1] Final Static Result", (70, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (36, 191, 124), 2)
         cv2.putText(menu_frame, "[2] Stages Grid", (70, 250), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (36, 191, 124), 2)
         cv2.putText(menu_frame, "[3] Pixel Animation", (70, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (36, 191, 124), 2)
-        cv2.putText(menu_frame, "[4] Full Animation Sequence", (70, 350), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (36, 191, 124), 2)
-        cv2.putText(menu_frame, "[ESC] Quit Program", (70, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        cv2.putText(menu_frame, "[4] Transition Animation", (70, 350), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (36, 191, 124), 2)
+        cv2.putText(menu_frame, "[5] C Constant simulation", (70, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (36, 191, 124), 2)
+        cv2.putText(menu_frame, "[ESC] Quit Program", (70, 450), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
         
         return menu_frame
-
     try:
         while True:
             menu_frame = draw_main_menu()
@@ -30,17 +30,25 @@ def run_interactive_viewer(img, m1, m2, m3, zoom_provider):
             
             key = cv2.waitKey(0) & 0xFF
 
+            m1, m2 = engine.get_slanted_map(c=1.0)
+            m3_x, m3_y = engine.get_static_maps(c=1.0)
+            
+            legacy_zoom_provider = lambda t, zoom_in=True: engine.get_zoom_frame(t, c=1.0, zoom_in=zoom_in)
+
             if key == ord('1'):
-                run_transformation(img, m3[0], m3[1]) 
+                run_transformation(img, m3_x, m3_y) 
                 
             elif key == ord('2'):
-                show_droste_stages(img, m1, m2, m3)
+                show_droste_stages(img, m1, m2, (m3_x, m3_y))
 
             elif key == ord('3'):
-                animate_droste(img,m3[0],m3[1])
+                animate_droste(img, m3_x, m3_y)
 
             elif key == ord('4'):
-                animate_droste_steps(img, m1, m2, m3, zoom_provider)
+                animate_droste_steps(img, m1, m2, (m3_x, m3_y), legacy_zoom_provider)
+                
+            elif key == ord('5'):
+                c_constant_simulation(img, engine)
                 
             elif key == ord('q') or key == 27:
                 break

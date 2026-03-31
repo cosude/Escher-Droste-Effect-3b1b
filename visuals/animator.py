@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import time 
 
 def ease_in_out_quad(t):
     return 2 * t * t if t < 0.5 else 1 - pow(-2 * t + 2, 2) / 2
@@ -137,4 +138,36 @@ def animate_droste_steps(img, m1, m2, m3, zoom_provider, frames_per_step=60):
         
         if cv2.waitKey(1) != -1: 
             break
+
+def c_constant_simulation(img, engine):
+
+    window_name = "Droste Math Visualizer"
+    cv2.createTrackbar("Rotation", window_name, 60, 100, lambda x: None)
+    cv2.createTrackbar("Zoom Speed", window_name, 5, 20, lambda x: None)
+
+    start_time = time.time()
+    
+    while True:
+        slider_c = cv2.getTrackbarPos("Rotation", window_name)
+        c = (slider_c-50)/10.0
+        
+        slider_speed = cv2.getTrackbarPos("Zoom Speed", window_name)
+        speed = slider_speed / 10.0 
+        
+        elapsed_time = time.time() - start_time
+        t = (elapsed_time * speed) % 1.0
+
+        map_x, map_y = engine.get_zoom_frame(t=t, c=c)
+
+        result = cv2.remap(img, map_x, map_y, cv2.INTER_LINEAR, borderMode=cv2.BORDER_WRAP)
+        
+        cv2.putText(result, f"c = {c:.1f}", (30, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(result, "Auto-Zooming", (30, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (200, 200, 200), 1)
+        
+        cv2.imshow(window_name, result)
+        
+        if cv2.waitKey(1) != -1: 
+            break
+            
+    cv2.destroyWindow(window_name)
             
